@@ -2,7 +2,8 @@
   <section class="container">
     <h1>New Post</h1>
     <form @submit.prevent="saveContact">
-      <div class="field">
+      <div id="imageTarget">
+        <div class="field">
         <label class="label">First Name</label>
         <div class="control">
           <input class="input" type="text" placeholder="First Name" v-model="firstname" required>
@@ -32,12 +33,20 @@
           <button type="submit" class="button is-link">Submit</button>
         </div>
       </div>
+      </div>
     </form>
+    <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Hello%20world" target="_blank" data-size="large">Tweet</a>
+    <button class="button is-primary" v-on:click="generateImage">image</button>
+    <h3>↓↓ここから画像化↓↓（上の対象のDIVを画像化）</h3>
+      <img src="" id="result" />
+    <h3>↑↑ここまで画像↑↑</h3>
   </section>
 </template>
 
 <script>
 import db from './firebaseInit'
+import html2canvas from 'html2canvas'
+
 export default {
   name: 'new-post',
   data () {
@@ -70,6 +79,13 @@ export default {
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
       })
       return uuid
+    },
+    generateImage () {
+      // https://html2canvas.hertzen.com/getting-started
+      html2canvas(document.getElementById('imageTarget')).then(canvas => {
+        var imgData = canvas.toDataURL()
+        document.getElementById('result').src = imgData
+      })
     }
   }
 }
