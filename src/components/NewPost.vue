@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <h1>Add New Contact</h1>
+    <h1>New Post</h1>
     <form @submit.prevent="saveContact">
       <div class="field">
         <label class="label">First Name</label>
@@ -39,7 +39,7 @@
 <script>
 import db from './firebaseInit'
 export default {
-  name: 'new-contact',
+  name: 'new-post',
   data () {
     return {
       firstname: null,

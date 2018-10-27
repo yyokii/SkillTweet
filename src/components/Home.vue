@@ -1,10 +1,10 @@
 <template>
   <section class="container">
     <div class="columns">
-      <div class="column is-8">
-        <h1>All Contacts</h1>
+      <div class="column auto">
+        <h1> Home </h1>
 
-        <router-link class="button is-primary" to="/add">Add New Contact</router-link>
+        <router-link class="button is-primary" to="/add">New Post</router-link>
 
         <div class="loader-section" v-if="loading">
           <div class="user-list">
@@ -15,7 +15,7 @@
                 <p class="user-list__sub animated-background__sub"></p>
               </div>
               <div class="column is-4 right">
-                <router-link class="button is-primary" to="/user">View Person</router-link>
+                <router-link class="button is-primary" to="/user">View Post</router-link>
               </div>
             </div>
           </div>
@@ -28,7 +28,7 @@
                 <p class="user-list__sub animated-background__sub"></p>
               </div>
               <div class="column is-4 right">
-                <router-link class="button is-primary" to="/user">View Person</router-link>
+                <router-link class="button is-primary" to="/user">View Post</router-link>
               </div>
             </div>
           </div>
@@ -41,7 +41,7 @@
                 <p class="user-list__sub animated-background__sub"></p>
               </div>
               <div class="column is-4 right">
-                <router-link class="button is-primary" to="/user">View Person</router-link>
+                <router-link class="button is-primary" to="/user">View Post</router-link>
               </div>
             </div>
           </div>
@@ -54,7 +54,7 @@
                 <p class="user-list__sub animated-background__sub"></p>
               </div>
               <div class="column is-4 right">
-                <router-link class="button is-primary" to="/user">View Person</router-link>
+                <router-link class="button is-primary" to="/user">View Post</router-link>
               </div>
             </div>
           </div>
@@ -74,7 +74,7 @@
               </div>
             </div>
             <div class="column is-4 right">
-              <router-link class="button is-primary" v-bind:to="{ name: 'view-contact', params: { person: person.slug }}">View Person</router-link>
+              <router-link class="button is-primary" :to="{ name: 'detail-post', params: { person: person.slug }}">View Post</router-link>
             </div>
           </div>
         </div>

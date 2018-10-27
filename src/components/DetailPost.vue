@@ -1,7 +1,7 @@
 <template>
   <section class="container">
 
-    <h1>View Contact</h1>
+    <h1>Detail Post</h1>
 
     <div class="contact--section">
       <p class="__name">{{firstname}} {{lastname}}</p>
@@ -17,7 +17,7 @@
 <script>
 import db from './firebaseInit'
 export default {
-  name: 'view-contact',
+  name: 'detail-post',
   data () {
     return {
       firstname: null,
