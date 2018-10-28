@@ -1,12 +1,11 @@
 <template>
-  <section class="container">
-    <div class="columns">
-      <div class="column auto">
+    <v-container>
+      <v-layout column wrap>
         <h1> Home </h1>
+        <!-- https://forum.vuejs.org/t/how-to-use-router-link-correctly-with-vuetify-buttons/31256/2 -->
+        <v-btn color="primary" to="/new-post">NewPost</v-btn>
 
-        <router-link class="button is-primary" to="/add">New Post</router-link>
-
-        <div class="loader-section" v-if="loading">
+        <!-- <div class="loader-section" v-if="loading">
           <div class="user-list">
             <div class="columns">
               <div class="column is-8">
@@ -77,10 +76,9 @@
               <router-link class="button is-primary" :to="{ name: 'detail-post', params: { person: person.slug }}">View Post</router-link>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
+        </div> -->
+      </v-layout>
+    </v-container>
 
 </template>
 
@@ -113,103 +111,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  h1 {
-    font-size: 30px;
-    margin: 30px 0;
-  }
-  .user-list {
-    margin-top: 30px;
-    background-color: white;
-    padding: 20px;
-    box-shadow: 0 0 5px 0 rgba(0,0,0,0.05);
-    .column {
-      height: 120px;
-    }
-    .inner {
-      .left {
-        width: 50%;
-        float: left;
-        text-align: left;
-      }
-      .right {
-        width: 50%;
-        float: left;
-        text-align: left;
-        p {
-          width: 100%;
-          text-align: left;
-        }
-      }
-    }
-    .right {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      button {
-        background: #4B75FF;
-      }
-    }
-    .user-list__header {
-      font-size: 20px;
-      font-weight: 700;
-    }
-    .user-list__sub {
-      font-size: 15px;
-      margin-top: 10px;
-    }
-  }
-  @keyframes placeHolderShimmer{
-    0%{
-      background-position: -468px 0
-    }
-    100%{
-      background-position: 468px 0
-    }
-  }
-  .animated-background__header {
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-iteration-count: infinite;
-    animation-iteration-count: infinite;
-    -webkit-animation-name: placeHolderShimmer;
-    animation-name: placeHolderShimmer;
-    -webkit-animation-timing-function: linear;
-    animation-timing-function: linear;
-    background: #f6f7f8;
-    background: #eeeeee;
-    background: -webkit-gradient(linear, left top, right top, color-stop(8%, #eeeeee), color-stop(18%, #dddddd), color-stop(33%, #eeeeee));
-    background: -webkit-linear-gradient(left, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
-    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
-    -webkit-background-size: 800px 104px;
-    background-size: 800px 104px;
-    height: 20px;
-    width: 400px;
-    position: relative;
-  }
-  .animated-background__sub {
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-iteration-count: infinite;
-    animation-iteration-count: infinite;
-    -webkit-animation-name: placeHolderShimmer;
-    animation-name: placeHolderShimmer;
-    -webkit-animation-timing-function: linear;
-    animation-timing-function: linear;
-    background: #f6f7f8;
-    background: #eeeeee;
-    background: -webkit-gradient(linear, left top, right top, color-stop(8%, #eeeeee), color-stop(18%, #dddddd), color-stop(33%, #eeeeee));
-    background: -webkit-linear-gradient(left, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
-    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
-    -webkit-background-size: 800px 104px;
-    background-size: 800px 104px;
-    height: 20px;
-    width: 200px;
-    position: relative;
-  }
-</style>

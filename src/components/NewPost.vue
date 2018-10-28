@@ -1,46 +1,80 @@
 <template>
-  <section class="container">
-    <h1>New Post</h1>
-    <form @submit.prevent="saveContact">
-      <div id="imageTarget">
-        <div class="field">
-        <label class="label">First Name</label>
-        <div class="control">
-          <input class="input" type="text" placeholder="First Name" v-model="firstname" required>
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Last Name</label>
-        <div class="control">
-          <input class="input" type="text" placeholder="Last Name" v-model="lastname" required>
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Email Address</label>
-        <div class="control">
-          <input class="input" type="email" placeholder="Email Address" v-model="emailaddress" required>
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Phone Number</label>
-        <div class="control">
-          <input class="input" type="text" placeholder="Phone Number" v-model="phonenumber" required>
-        </div>
-      </div>
+  <v-container fluid>
+    <v-layout wrap>
+      <v-flex  align-center xs8 offset-xs2 mt-3>
+        <!-- <div>
+          <radarChart :data="radarChartData" :option="radarChartOptions"></radarChart>
+        </div> -->
 
-      <div class="field">
-        <div class="control">
-          <button type="submit" class="button is-link">Submit</button>
-        </div>
-      </div>
-      </div>
-    </form>
-    <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Hello%20world" target="_blank" data-size="large">Tweet</a>
-    <button class="button is-primary" v-on:click="generateImage">image</button>
-    <h3>↓↓ここから画像化↓↓（上の対象のDIVを画像化）</h3>
-      <img src="" id="result" />
-    <h3>↑↑ここまで画像↑↑</h3>
-  </section>
+        <!-- （入力）名前 -->
+        <v-text-field
+          class="mt-5"
+          v-model="name"
+          :rules="nameRules"
+          :counter="10"
+          label="名前を入れてね🙂"
+        ></v-text-field>
+
+        <!-- （入力）スキルセット -->
+        <v-combobox
+          class="mt-5"
+          v-model="chips"
+          :items="items"
+          label="Your favorite hobbies"
+          chips
+          clearable
+          solo
+          multiple
+        >
+          <template slot="selection" slot-scope="data">
+            <v-chip
+              :selected="data.selected"
+              close
+              @input="remove(data.item)"
+            >
+              <strong>{{ data.item }}</strong>&nbsp;
+            </v-chip>
+          </template>
+        </v-combobox>
+
+        <!-- TODO: disable（画像重複とか避けたい） -->
+        <v-btn
+          color="primary"
+          class="white--text"
+          @click="generateImage()"
+
+        >
+          作成する
+          <v-icon right dark>edit</v-icon>
+        </v-btn>
+
+        <!-- 画像化対象 -->
+        <v-card class="mt-5" id="imageTarget">
+            <h2 class="text-xs-center" v-if="name.length > 0 && name.length <= 10">{{ name }} のできること</h2>
+            <div class="text-xs-center mt-4">
+              <v-chip
+                color="primary"
+                text-color="white"
+                v-for="chip in chips"
+                :key="chip.id"
+              >
+                {{ chip }}
+              </v-chip>
+            </div>
+        </v-card>
+
+        <!-- 画像化したものを表示する -->
+        <!-- https://qiita.com/youwht/items/8b681a856f59aa82d671 -->
+        <v-card class="mt-5">
+            <h2 class="text-xs-center"> Tweet イメージ👇</h2>
+            <div class="mt-4">
+                <img src="" id="genaratedImage" width="600" height="314"/>
+            </div>
+        </v-card>
+
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -51,10 +85,14 @@ export default {
   name: 'new-post',
   data () {
     return {
-      firstname: null,
-      lastname: null,
-      emailaddress: null,
-      phonenumber: null
+      chips: [],
+      items: ['Swift', 'JavaScript'],
+      colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
+      name: '',
+      nameRules: [
+        v => !!v || 'Name is required',
+        v => (v && v.length <= 10) || 'Name must be less than 10 characters'
+      ]
     }
   },
   methods: {
@@ -84,22 +122,13 @@ export default {
       // https://html2canvas.hertzen.com/getting-started
       html2canvas(document.getElementById('imageTarget')).then(canvas => {
         var imgData = canvas.toDataURL()
-        document.getElementById('result').src = imgData
+        document.getElementById('genaratedImage').src = imgData
       })
+    },
+    remove (item) {
+      this.chips.splice(this.chips.indexOf(item), 1)
+      this.chips = [...this.chips]
     }
   }
 }
 </script>
-
-<style scoped>
-section {
-  height: 100vh;
-}
-h1 {
-  font-size: 30px;
-  margin: 30px 0;
-}
-.input {
-  height: 40px;
-}
-</style>

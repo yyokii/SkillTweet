@@ -56,24 +56,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  section {
-    height: 100vh;
-  }
-  h1 {
-    font-size: 30px;
-    margin: 30px 0;
-  }
-  p {
-    margin-bottom: 20px;
-  }
-  .contact--section {
-    background-color: white;
-    padding: 20px;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.05);
-    .__name {
-      font-size: 30px;
-    }
-  }
-</style>
