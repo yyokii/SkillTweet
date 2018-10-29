@@ -37,17 +37,6 @@
           </template>
         </v-combobox>
 
-        <!-- TODO: disable（画像重複とか避けたい） -->
-        <v-btn
-          color="primary"
-          class="white--text"
-          @click="generateImage()"
-
-        >
-          作成する
-          <v-icon right dark>edit</v-icon>
-        </v-btn>
-
         <!-- 画像化対象 -->
         <v-card class="mt-5" id="imageTarget">
             <h2 class="text-xs-center" v-if="name.length > 0 && name.length <= 10">{{ name }} のできること</h2>
@@ -63,12 +52,23 @@
             </div>
         </v-card>
 
+        <!-- TODO: disable（画像重複とか避けたい） -->
+        <v-btn
+          color="primary"
+          class="white--text mt-5"
+          @click="generateImage()"
+
+        >
+          作成する
+          <v-icon right dark>edit</v-icon>
+        </v-btn>
+
         <!-- 画像化したものを表示する -->
         <!-- https://qiita.com/youwht/items/8b681a856f59aa82d671 -->
-        <v-card class="mt-5">
+        <v-card class="mt-5" v-if="showTweetImg">
             <h2 class="text-xs-center"> Tweet イメージ👇</h2>
             <div class="mt-4">
-                <img src="" id="genaratedImage" width="600" height="314"/>
+                <img src="" id="genaratedImage"/>
             </div>
         </v-card>
 
@@ -92,7 +92,8 @@ export default {
       nameRules: [
         v => !!v || 'Name is required',
         v => (v && v.length <= 10) || 'Name must be less than 10 characters'
-      ]
+      ],
+      showTweetImg: false
     }
   },
   methods: {
@@ -119,6 +120,7 @@ export default {
       return uuid
     },
     generateImage () {
+      this.showTweetImg = true
       // https://html2canvas.hertzen.com/getting-started
       html2canvas(document.getElementById('imageTarget')).then(canvas => {
         var imgData = canvas.toDataURL()
@@ -132,3 +134,13 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+// https://1design.jp/web-development/css/1844
+  img {
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:100%;
+  }
+</style>
