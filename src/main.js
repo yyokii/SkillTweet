@@ -6,22 +6,17 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
-import colors from 'vuetify/es5/util/colors'
 import router from './router'
 import App from './App'
-import RadarChart from './components/RadarChart.vue'
-import EditSkillDialog from './components/EditSkillDialog.vue'
 
 Vue.config.productionTip = false
 
-Vue.component('radarChart', RadarChart)
-Vue.component('edit-skill-dialog', EditSkillDialog)
-
+// https://vuetifyjs.com/ja/style/theme
 Vue.use(Vuetify, {
   theme: {
-    primary: colors.blue.darken1,
-    secondary: colors.blue.lighten1,
-    accent: colors.cyan.accent1
+    primary: '#2C2E7D',
+    secondary: '#A9A9A9',
+    accent: '#F11743'
   }
 })
 
