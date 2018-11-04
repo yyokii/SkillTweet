@@ -59,18 +59,20 @@
           @click="generateImage()"
 
         >
-          作成する
+          Tweetする
           <v-icon right dark>edit</v-icon>
         </v-btn>
 
+        <!-- tweetボタン押したら画像作成、遷移でいいかも（つまり以下はいらない）-->
         <!-- 画像化したものを表示する -->
         <!-- https://qiita.com/youwht/items/8b681a856f59aa82d671 -->
-        <v-card class="mt-5" v-if="showTweetImg">
+        <!-- <v-card class="mt-5" v-if="showTweetImg">
             <h2 class="text-xs-center"> Tweet イメージ👇</h2>
             <div class="mt-4">
                 <img src="" id="genaratedImage"/>
             </div>
         </v-card>
+        <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=http://localhost:8080/new-post" target="_blank" data-size="large">Tweet</a> -->
 
       </v-flex>
     </v-layout>
@@ -95,6 +97,10 @@ export default {
       ],
       showTweetImg: false
     }
+  },
+  mounted () {
+    // https://sourceacademy.work/#/vuejs/vueSetPageTitle#VuejsSetPageTitle2
+    document.querySelector("meta[property='og:title']").setAttribute('content', 'こっちだよ')
   },
   methods: {
     saveContact () {
@@ -124,7 +130,9 @@ export default {
       // https://html2canvas.hertzen.com/getting-started
       html2canvas(document.getElementById('imageTarget')).then(canvas => {
         var imgData = canvas.toDataURL()
-        document.getElementById('genaratedImage').src = imgData
+        // document.getElementById('genaratedImage').src = imgData
+        document.querySelector("meta[property='og:image']").setAttribute('content', imgData)
+        window.open('https://twitter.com/intent/tweet?text=http://localhost:8080/new-post')
       })
     },
     remove (item) {
