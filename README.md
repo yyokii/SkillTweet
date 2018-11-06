@@ -1,4 +1,4 @@
-# firestoreapp
+# skilltweetapp
 
 > A Vue.js project
 

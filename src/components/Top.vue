@@ -14,7 +14,7 @@
             <img src="../assets/logo.png" alt="Skill App" height="300">
             <h1 class="font-weight-black black--text mb-2 display-2 text-xs-center">自分のスキルをTwitterでアピール！</h1>
             <v-btn
-              class="mt-5"
+              class="font-weight-bold mt-5"
               color="primary"
               large
               to="/new-post"
@@ -99,7 +99,7 @@
             <div class="headline font-weight-bold white--text mb-3 text-xs-center">あなたのスキルはきっと誰かを幸せにする</div>
             <em>知ってもらうことから始めよう</em>
             <v-btn
-              class="mt-5"
+              class="font-weight-bold mt-5"
               color="primary"
               large
               to="/new-post"
@@ -148,18 +148,12 @@
                 <v-list class="transparent">
                   <v-list-tile>
                     <v-list-tile-action>
-                      <v-icon class="blue--text text--lighten-2">phone</v-icon>
+                      <v-icon class="blue--text text--lighten-2">fab fa-twitter</v-icon>
                     </v-list-tile-action>
                     <v-list-tile-content>
-                      <v-list-tile-title class="text-xs-center">777-867-5309</v-list-tile-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                  <v-list-tile>
-                    <v-list-tile-action>
-                      <v-icon class="blue--text text--lighten-2">place</v-icon>
-                    </v-list-tile-action>
-                    <v-list-tile-content>
-                      <v-list-tile-title class="text-xs-center"> Chicago, US</v-list-tile-title>
+                      <v-list-tile-title class="text-xs-center">
+                        <a class="center" href="https://twitter.com/enyyokii" target="_blank">@enyyokii</a>
+                      </v-list-tile-title>
                     </v-list-tile-content>
                   </v-list-tile>
                   <v-list-tile>
@@ -167,7 +161,15 @@
                       <v-icon class="blue--text text--lighten-2">email</v-icon>
                     </v-list-tile-action>
                     <v-list-tile-content>
-                      <v-list-tile-title class="text-xs-center">john@vuetifyjs.com</v-list-tile-title>
+                      <v-list-tile-title class="text-xs-center">yyokii.h@gmail.com</v-list-tile-title>
+                    </v-list-tile-content>
+                  </v-list-tile>
+                  <v-list-tile>
+                    <v-list-tile-action>
+                      <v-icon class="blue--text text--lighten-2">place</v-icon>
+                    </v-list-tile-action>
+                    <v-list-tile-content>
+                      <v-list-tile-title class="text-xs-center"> 東京, 埼玉</v-list-tile-title>
                     </v-list-tile-content>
                   </v-list-tile>
                 </v-list>
@@ -183,31 +185,7 @@
 </template>
 
 <script>
-import db from '../firebaseInit'
-
 export default {
-  name: 'top',
-  data () {
-    return {
-      contacts: [],
-      loading: true
-    }
-  },
-  created () {
-    db.collection('contacts').get().then((querySnapshot) => {
-      this.loading = false
-      querySnapshot.forEach((doc) => {
-        let data = {
-          'id': doc.id,
-          'firstname': doc.data().firstname,
-          'lastname': doc.data().lastname,
-          'emailaddress': doc.data().emailaddress,
-          'phonenumber': doc.data().phonenumber,
-          'slug': doc.data().slug
-        }
-        this.contacts.push(data)
-      })
-    })
-  }
+  name: 'top'
 }
 </script>

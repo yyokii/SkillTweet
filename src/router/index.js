@@ -6,8 +6,7 @@ Vue.use(Router)
 const routerOptions = [
   { path: '*', component: 'NotFound' },
   { path: '/', component: 'Top' },
-  { path: '/new-post', component: 'NewPost' },
-  { path: '/detail-post', component: 'Signup' }
+  { path: '/new-post', component: 'NewPost' }
 ]
 
 const routes = routerOptions.map(route => {

@@ -1,9 +1,6 @@
 <template>
   <v-container fluid>
     <v-layout wrap>
-        <!-- <div>
-          <radarChart :data="radarChartData" :option="radarChartOptions"></radarChart>
-        </div> -->
 
         <!-- （入力）名前 -->
         <v-flex class="xs12 mt-5">
@@ -34,9 +31,9 @@
         <v-flex class="xs8 offset-xs2 mt-3">
           <v-combobox
             class="mt-3"
-            v-model="chips"
+            v-model="skills"
             :items="items"
-            label="Your favorite hobbies"
+            label="スキルを入力しよう"
             chips
             clearable
             solo
@@ -44,6 +41,7 @@
           >
             <template slot="selection" slot-scope="data">
               <v-chip
+                color="indigo lighten-4"
                 :selected="data.selected"
                 close
                 @input="remove(data.item)"
@@ -54,33 +52,35 @@
           </v-combobox>
         </v-flex>
 
-          <!-- 画像化対象 -->
-        <v-flex class="xs8 offset-xs2 mt-3"
-          v-if="name.length > 0 && name.length <= 10"
-        >
-          <v-card class="mt-5" id="imageTarget">
+        <!-- 画像化対象 -->
+        <v-flex class="xs8 offset-xs2 mt-3" v-if="validateTweetContent">
+          <h2 class="mt-3">
+            <v-icon class="accent--text">thumb_up_alt</v-icon>
+            共有しよう！
+          </h2>
+          <v-card class="mt-4" id="imageTarget">
               <h4 class="text-xs-center pt-2">{{ name }} のスキル</h4>
               <div class="text-xs-center mt-2 pb-2">
                 <v-chip
-                  color="primary"
-                  text-color="white"
-                  v-for="chip in chips"
-                  :key="chip.id"
+                  :color="`${getColor()} lighten-3`"
+                  text-color="black"
+                  v-for="skill in skills"
+                  :key="skill.id"
                 >
-                  {{ chip }}
+                  {{ skill }}
                 </v-chip>
               </div>
           </v-card>
         </v-flex>
 
-        <!-- TODO: disable（画像重複とか避けたい） -->
-        <v-flex class="xs6 offset-xs3 mt-3">
+        <v-flex class="xs6 offset-xs3 mt-4 mb-5" v-if="validateTweetContent">
           <v-btn
-            color="primary"
-            class="white--text mt-5"
-            @click="generateImage()"
+            color="#00aced"
+            class="font-weight-bold white--text mt-5"
+            @click="post()"
+            :disabled="isPushed"
           >
-            Tweetする
+            ツイートする
             <v-icon right dark>edit</v-icon>
           </v-btn>
         </v-flex>
@@ -97,57 +97,73 @@ export default {
   name: 'new-post',
   data () {
     return {
-      chips: [],
-      items: ['Swift', 'JavaScript'],
-      colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
+      skills: [],
+      items: [],
+      colors: ['red', 'green', 'light-green', 'purple', 'deep-purple', 'indigo', 'blue', 'light-blue', 'cyan', 'teal', 'orange', 'pink',
+        'amber', 'lime', 'deep-orange', 'brown', 'blue-grey'],
       name: '',
       nameRules: [
-        v => !!v || 'Name is required',
-        v => (v && v.length <= 10) || 'Name must be less than 10 characters'
+        v => !!v || '名前は必須です⚠️',
+        v => (v && v.length <= 10) || '10文字以内⚠️'
       ],
-      showTweetImg: false
+      // http://www.sky-limit-future.com/entry/vue_disabled_btn
+      isPushed: false
     }
   },
-  mounted () {
-    // https://sourceacademy.work/#/vuejs/vueSetPageTitle#VuejsSetPageTitle2
-    document.querySelector("meta[property='og:title']").setAttribute('content', 'こっちだよ')
+  computed: {
+    validateTweetContent () {
+      if ((this.name.length > 0 && this.name.length <= 10) && this.skills.length !== 0) {
+        return true
+      } else {
+        return false
+      }
+    }
   },
   methods: {
-    saveContact () {
-      db.collection('contacts').add({
-        firstname: this.firstname,
-        lastname: this.lastname,
-        emailaddress: this.emailaddress,
-        phonenumber: this.phonenumber,
-        slug: this.generateUUID()
-      }).then(function (docRef) {
+    getColor () {
+      return this.colors[Math.floor(Math.random() * this.colors.length)]
+    },
+    post () {
+      this.isPushed = true
+      this.generateImage()
+      this.savePost(
+        _ => {
+          window.open('https://twitter.com/intent/tweet?text=http://localhost:8080/new-post')
+          document.querySelector("meta[property='og:image']").setAttribute('content', '')
+          this.isPushed = false
+        },
+        _ => {
+          this.isPushed = false
+        })
+    },
+    // firestoreに投稿情報を設定
+    savePost (success, fail) {
+      db.collection('posts').add({
+        name: this.name,
+        skills: this.skills,
+        timeStamp: Date.now()
+      }).then(docRef => {
         console.log('Document written with ID: ', docRef.id)
-      }).catch(function (error) {
+        success()
+      }).catch(error => {
         console.error('Error adding document: ', error)
+        fail()
       })
     },
-    generateUUID () {
-      let d = new Date().getTime()
-      let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        let r = (d + Math.random() * 16) % 16 | 0
-        d = Math.floor(d / 16)
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
-      })
-      return uuid
-    },
+    // tweet画像生成
     generateImage () {
-      this.showTweetImg = true
       // https://html2canvas.hertzen.com/getting-started
       html2canvas(document.getElementById('imageTarget')).then(canvas => {
         var imgData = canvas.toDataURL()
-        // document.getElementById('genaratedImage').src = imgData
+
+        // TODO: ここ切り出すかなんかしたい
+        // https://sourceacademy.work/#/vuejs/vueSetPageTitle#VuejsSetPageTitle2
         document.querySelector("meta[property='og:image']").setAttribute('content', imgData)
-        window.open('https://twitter.com/intent/tweet?text=http://localhost:8080/new-post')
       })
     },
     remove (item) {
-      this.chips.splice(this.chips.indexOf(item), 1)
-      this.chips = [...this.chips]
+      this.skills.splice(this.skills.indexOf(item), 1)
+      this.skills = [...this.skills]
     }
   }
 }
