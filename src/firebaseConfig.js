@@ -1,8 +1,8 @@
 export default {
-  apiKey: 'AIzaSyB_eCC7JtiMiDY0Kwd_PLBP0aximA7g2P0',
-  authDomain: 'firestorevueapp.firebaseapp.com',
-  databaseURL: 'https://firestorevueapp.firebaseio.com',
-  projectId: 'firestorevueapp',
-  storageBucket: 'firestorevueapp.appspot.com',
-  messagingSenderId: '363884786585'
+  apiKey: 'AIzaSyCZNrLBilmgu1y8SBdsNR8SA9hrl80ASag',
+  authDomain: 'skilltweetapp.firebaseapp.com',
+  databaseURL: 'https://skilltweetapp.firebaseio.com',
+  projectId: 'skilltweetapp',
+  storageBucket: 'skilltweetapp.appspot.com',
+  messagingSenderId: '689367987126'
 }

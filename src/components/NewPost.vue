@@ -128,7 +128,8 @@ export default {
       this.generateImage()
       this.savePost(
         _ => {
-          window.open('https://twitter.com/intent/tweet?text=http://localhost:8080/new-post')
+          // https://qiita.com/ampersand/items/2ec01bd5c5b64f1e67bf
+          window.open('https://twitter.com/share?url=https://skilltweetapp.firebaseapp.com&text=私のスキルです👍%20created%20by%20%23SkillApp')
           document.querySelector("meta[property='og:image']").setAttribute('content', '')
           this.isPushed = false
         },
