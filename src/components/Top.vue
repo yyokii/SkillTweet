@@ -185,7 +185,41 @@
 </template>
 
 <script>
+import firebase from '../firebaseInit'
+
 export default {
-  name: 'top'
+  name: 'top',
+  mounted () {
+    this.setAttribute()
+  },
+  methods: {
+    setAttribute () {
+      // https://teratail.com/questions/69562
+      const url = location.href
+      let splitedUrl = url.split('/').filter(e => Boolean(e))
+      if (splitedUrl[splitedUrl.length - 2] !== 'top') {
+        return
+      }
+      // /top/hoge 形式のurlの場合
+      const postDataRefId = splitedUrl[splitedUrl.length - 1]
+      const imagesRef = firebase.storage().ref().child('skillImages')
+      const imageRef = imagesRef.child(postDataRefId + '.jpg')
+
+      // Get the download URL
+      imageRef.getDownloadURL().then(url => {
+        // Insert url into an <img> tag to "download"
+        console.log('画像ダウンロードurl')
+        console.log(url)
+        document.querySelector("meta[property='og:image']").setAttribute('content', url)
+      }).catch(error => {
+        console.log(error)
+        console.log('ロゴを設定')
+        document.querySelector("meta[property='og:image']").setAttribute('content', 'src/assets/logo.jpg')
+      })
+
+      // https://sourceacademy.work/#/vuejs/vueSetPageTitle#VuejsSetPageTitle2
+      // document.querySelector("meta[property='og:image']").setAttribute('content', 'imgData')
+    }
+  }
 }
 </script>

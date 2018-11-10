@@ -5,7 +5,11 @@ Vue.use(Router)
 
 const routerOptions = [
   { path: '*', component: 'NotFound' },
+
   { path: '/', component: 'Top' },
+  { path: '/top', component: 'Top' },
+  { path: '/top/*', component: 'Top' },
+
   { path: '/new-post', component: 'NewPost' }
 ]
 

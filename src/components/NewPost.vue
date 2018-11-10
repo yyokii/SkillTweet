@@ -1,6 +1,21 @@
 <template>
   <v-container fluid>
     <v-layout wrap>
+        <v-snackbar
+          v-model="errorSnackbar"
+          :top="true"
+          color="error"
+          :timeout=3000
+        >
+          エラーが発生しました😓
+          <v-btn
+            dark
+            flat
+            @click="errorSnackbar = false"
+          >
+            閉じる
+          </v-btn>
+        </v-snackbar>
 
         <!-- （入力）名前 -->
         <v-flex class="xs12 mt-5">
@@ -79,6 +94,7 @@
             class="font-weight-bold white--text mt-5"
             @click="post()"
             :disabled="isPushed"
+            :loading="isPushed"
           >
             ツイートする
             <v-icon right dark>edit</v-icon>
@@ -90,13 +106,14 @@
 </template>
 
 <script>
-import db from '../firebaseInit'
+import firebase from '../firebaseInit'
 import html2canvas from 'html2canvas'
 
 export default {
   name: 'new-post',
   data () {
     return {
+      errorSnackbar: false,
       skills: [],
       items: [],
       colors: ['red', 'green', 'light-green', 'purple', 'deep-purple', 'indigo', 'blue', 'light-blue', 'cyan', 'teal', 'orange', 'pink',
@@ -120,46 +137,60 @@ export default {
     }
   },
   methods: {
+    // FIXME: 色の反映タイミングが多すぎるので修正したい
     getColor () {
       return this.colors[Math.floor(Math.random() * this.colors.length)]
     },
+    applyErrorUI () {
+      this.errorSnackbar = true
+      this.isPushed = false
+    },
     post () {
       this.isPushed = true
-      this.generateImage()
-      this.savePost(
-        _ => {
-          // https://qiita.com/ampersand/items/2ec01bd5c5b64f1e67bf
-          window.open('https://twitter.com/share?url=https://skilltweetapp.firebaseapp.com&text=私のスキルです👍%20created%20by%20%23SkillApp')
-          document.querySelector("meta[property='og:image']").setAttribute('content', '')
-          this.isPushed = false
-        },
-        _ => {
-          this.isPushed = false
-        })
-    },
-    // firestoreに投稿情報を設定
-    savePost (success, fail) {
-      db.collection('posts').add({
+      // firestoreへデータ保存処理
+      const savePostToFirebase = firebase.firestore().collection('posts').add({
         name: this.name,
         skills: this.skills,
         timeStamp: Date.now()
-      }).then(docRef => {
-        console.log('Document written with ID: ', docRef.id)
-        success()
-      }).catch(error => {
-        console.error('Error adding document: ', error)
-        fail()
       })
-    },
-    // tweet画像生成
-    generateImage () {
+      // 画像化処理
       // https://html2canvas.hertzen.com/getting-started
-      html2canvas(document.getElementById('imageTarget')).then(canvas => {
-        var imgData = canvas.toDataURL()
+      const generateImage = html2canvas(document.getElementById('imageTarget'))
 
-        // TODO: ここ切り出すかなんかしたい
-        // https://sourceacademy.work/#/vuejs/vueSetPageTitle#VuejsSetPageTitle2
-        document.querySelector("meta[property='og:image']").setAttribute('content', imgData)
+      // 非同期処理実行
+      // https://lab.syncer.jp/Web/JavaScript/Reference/Global_Object/Promise/all/
+      Promise.all([savePostToFirebase, generateImage])
+        .then(result => {
+          console.log('FireBaseへの投稿データ保存、画像化処理完了')
+          result[1].toBlob((blob) => {
+            this.uploadImageToFirebaseStorage(result[0].id, blob)
+          })
+        })
+        .catch(error => {
+          console.log(error)
+          this.applyErrorUI()
+        })
+    },
+    uploadImageToFirebaseStorage (postDataRefId, blob) {
+      // https://firebase.google.com/docs/storage/web/upload-files?hl=ja
+      const storageRef = firebase.storage().ref().child('skillImages')
+      const uploadTask = storageRef.child(postDataRefId + '.jpg').put(blob)
+      uploadTask.on('state_changed', (snapshot) => {
+        switch (snapshot.state) {
+          case 'paised':
+            console.log('Upload is paused')
+            break
+          case 'running':
+            console.log('Upload is running')
+            break
+        }
+      }, (error) => {
+        console.log(error)
+        this.applyErrorUI()
+      }, _ => {
+        this.isPushed = false
+        // https://qiita.com/ampersand/items/2ec01bd5c5b64f1e67bf
+        window.open(`https://twitter.com/share?url=https://skilltweetapp.firebaseapp.com/top/${postDataRefId}&text=私のスキルです👍%20created%20by%20%23SkillApp`)
       })
     },
     remove (item) {
