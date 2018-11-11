@@ -189,7 +189,7 @@ import firebase from '../firebaseInit'
 
 export default {
   name: 'top',
-  mounted () {
+  created () {
     this.setAttribute()
   },
   methods: {
@@ -198,6 +198,7 @@ export default {
       const url = location.href
       let splitedUrl = url.split('/').filter(e => Boolean(e))
       if (splitedUrl[splitedUrl.length - 2] !== 'top') {
+        document.querySelector("meta[property='og:image']").setAttribute('content', 'src/assets/logo.jpg')
         return
       }
       // /top/hoge 形式のurlの場合
@@ -210,6 +211,7 @@ export default {
         // Insert url into an <img> tag to "download"
         console.log('画像ダウンロードurl')
         console.log(url)
+        document.querySelector("meta[property='og:url']").setAttribute('content', `https://skilltweetapp.firebaseapp.com/top/${postDataRefId}`)
         document.querySelector("meta[property='og:image']").setAttribute('content', url)
       }).catch(error => {
         console.log(error)
