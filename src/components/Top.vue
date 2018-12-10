@@ -190,7 +190,7 @@ import firebase from '../firebaseInit'
 export default {
   name: 'top',
   created () {
-    this.setAttribute()
+    // this.setAttribute()
   },
   methods: {
     setAttribute () {
