@@ -119,6 +119,9 @@
                   <div class="headline">つくった人</div>
                 </v-card-title>
                 <v-card-text>
+                  Yoki😄
+                  <br>
+                  <br>
                   渋谷のIT企業のアプリエンジニア:)
                   <br>
                   25才. 肉と猫とAppleが好きです✌︎
@@ -185,43 +188,8 @@
 </template>
 
 <script>
-import firebase from '../firebaseInit'
 
 export default {
-  name: 'top',
-  created () {
-    // this.setAttribute()
-  },
-  methods: {
-    setAttribute () {
-      // https://teratail.com/questions/69562
-      const url = location.href
-      let splitedUrl = url.split('/').filter(e => Boolean(e))
-      if (splitedUrl[splitedUrl.length - 2] !== 'top') {
-        document.querySelector("meta[property='og:image']").setAttribute('content', 'src/assets/logo.jpg')
-        return
-      }
-      // /top/hoge 形式のurlの場合
-      const postDataRefId = splitedUrl[splitedUrl.length - 1]
-      const imagesRef = firebase.storage().ref().child('skillImages')
-      const imageRef = imagesRef.child(postDataRefId + '.jpg')
-
-      // Get the download URL
-      imageRef.getDownloadURL().then(url => {
-        // Insert url into an <img> tag to "download"
-        console.log('画像ダウンロードurl')
-        console.log(url)
-        document.querySelector("meta[property='og:url']").setAttribute('content', `https://skilltweetapp.firebaseapp.com/top/${postDataRefId}`)
-        document.querySelector("meta[property='og:image']").setAttribute('content', url)
-      }).catch(error => {
-        console.log(error)
-        console.log('ロゴを設定')
-        document.querySelector("meta[property='og:image']").setAttribute('content', 'src/assets/logo.jpg')
-      })
-
-      // https://sourceacademy.work/#/vuejs/vueSetPageTitle#VuejsSetPageTitle2
-      // document.querySelector("meta[property='og:image']").setAttribute('content', 'imgData')
-    }
-  }
+  name: 'top'
 }
 </script>

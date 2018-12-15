@@ -31,7 +31,7 @@
           v-model="name"
           :counter="10"
           :rules="nameRules"
-          label="ニックネーム🤗"
+          label="ニックネーム😉"
           solo
           ></v-text-field>
         </v-flex>
@@ -111,18 +111,22 @@
           </v-layout>
 
           <!-- 画像化対象 -->
-          <v-card class="mt-2" id="imageTarget">
-              <h4 class="text-xs-center pt-2">{{ name }} のスキル</h4>
-              <div class="text-xs-center mt-2 pb-2">
-                <v-chip
-                  :color="`${getColor()} lighten-3`"
-                  text-color="black"
-                  v-for="skill in skills"
-                  :key="skill.id"
-                >
-                  {{ skill }}
-                </v-chip>
+          <v-card class="tweetContentBack mt-2 pt-2 pb-2 pl-2 pr-2" id="imageTarget">
+            <v-responsive class="whiteBack" :aspect-ratio="2/1">
+              <div class="mt-3">
+                <h4 class="text-xs-center">{{ name }} のスキル</h4>
+                <div class="text-xs-center mt-2">
+                  <v-chip
+                    :color="`${getColor()} lighten-3`"
+                    text-color="black"
+                    v-for="skill in skills"
+                    :key="skill.id"
+                  >
+                    {{ skill }}
+                  </v-chip>
+                </div>
               </div>
+            </v-responsive>
           </v-card>
         </v-flex>
 
@@ -202,28 +206,33 @@ export default {
     },
     post () {
       this.isPushed = true
-      // TODO: コールバック綺麗に書きたい
       // firestoreへデータ保存処理
-      firebase.firestore().collection('posts').add({
+      const savePostToFirebase = firebase.firestore().collection('posts').add({
         name: this.name,
         skills: this.skills,
         timeStamp: Date.now()
-      }).then(ref => {
-        // 画像化処理
-        // https://html2canvas.hertzen.com/getting-started
-        html2canvas(document.getElementById('imageTarget')).then(canvas => {
-          // canvasをdataurlにしてjimpでリサイズ
-          const imageDataUrl = canvas.toDataURL()
+      })
+      // 画像化処理
+      // https://html2canvas.hertzen.com/getting-started
+      const generateImage = html2canvas(document.getElementById('imageTarget'))
 
+      // 非同期処理実行
+      // https://lab.syncer.jp/Web/JavaScript/Reference/Global_Object/Promise/all/
+      Promise.all([savePostToFirebase, generateImage])
+        .then(result => {
+          console.log('FireBaseへの投稿データ保存、画像化処理完了')
+          const imageDataUrl = result[1].toDataURL()
           // https://github.com/oliver-moran/jimp/issues/231
           if (imageDataUrl.indexOf('base64') !== -1) {
+            // 画像リサイズ処理
             jimp.read(Buffer.from(imageDataUrl.replace(/^data:image\/png;base64,/, ''), 'base64')).then((image, error) => {
               if (error) {
                 console.log(error)
                 return
               }
+              // これいらないかも
               image
-                .contain(1200, 620)
+                .contain(1024, 512)
                 .getBase64(jimp.MIME_PNG, (error, src) => {
                   if (error) {
                     console.log(error)
@@ -232,20 +241,15 @@ export default {
                   // blobに変換してfirestorageにアップロード
                   const replacedSrc = src.replace(/^data:image\/png;base64,/, '')
                   const blob = this.base64ToBlob(replacedSrc)
-                  this.uploadImageToFirebaseStorage(ref.id, blob)
+                  this.uploadImageToFirebaseStorage(result[0].id, blob)
                 })
             })
-          } else {
-            this.applyErrorUI()
           }
-        }).catch(error => {
+        })
+        .catch(error => {
           console.log(error)
           this.applyErrorUI()
         })
-      }).catch(error => {
-        console.log(error)
-        this.applyErrorUI()
-      })
     },
     uploadImageToFirebaseStorage (postDataRefId, blob) {
       // https://firebase.google.com/docs/storage/web/upload-files?hl=ja
@@ -268,6 +272,27 @@ export default {
         // https://qiita.com/ampersand/items/2ec01bd5c5b64f1e67bf
         window.open(`https://twitter.com/share?url=https://skilltweetapp.firebaseapp.com/top/${postDataRefId}&text=私のスキルです👍%20created%20by%20%23SkillApp`)
       })
+    },
+    imageResize (imageDataUrl) {
+      // https://github.com/oliver-moran/jimp/issues/231
+      if (imageDataUrl.indexOf('base64') !== -1) {
+        jimp.read(Buffer.from(imageDataUrl.replace(/^data:image\/png;base64,/, ''), 'base64')).then((image, error) => {
+          if (error) {
+            console.log(error)
+            return error
+          }
+          image
+            .contain(1200, 600)
+            .getBase64(jimp.MIME_PNG, (error, src) => {
+              if (error) {
+                console.log(error)
+                return error
+              }
+              // blobに変換してfirestorageにアップロード
+              return src
+            })
+        })
+      }
     },
     base64ToBlob (base64) {
       var binary = atob(base64)
@@ -292,11 +317,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// https://1design.jp/web-development/css/1844
-  img {
-    width:auto;
-    height:auto;
-    max-width:100%;
-    max-height:100%;
+  .tweetContentBack {
+    background-image: url("../assets/tweetBack.png");
+    background-size: cover;
+  }
+  .whiteBack {
+    background-color: #ffffff;
   }
 </style>
