@@ -130,16 +130,37 @@
           </v-card>
         </v-flex>
 
+        <!-- Tweet確認ダイアログ -->
+        <v-dialog v-model="confirmDialog" persistent max-width="290">
+          <v-card>
+            <v-card-title class="headline">Tweetしよう😄</v-card-title>
+              <v-card-text>
+                Nice!!
+                <br>
+                画像の作成に成功しました！
+                <br>
+                Tweetボタンからツイートができます😆
+              </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="green darken-1" flat @click="confirmDialog = false">キャンセル</v-btn>
+              <v-btn color="green darken-1" flat @click="tweet()">
+                Tweetする
+                <v-icon right dark>fab fa-twitter</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
         <v-flex xs6 offset-xs3 mt-4 mb-5 v-if="validateTweetContent">
           <v-btn
             color="#00aced"
             class="font-weight-bold white--text mt-5"
-            @click="post()"
+            @click="createCard()"
             :disabled="isPushed"
             :loading="isPushed"
           >
-            ツイートする
-            <v-icon right dark>fab fa-twitter</v-icon>
+            作成する
           </v-btn>
         </v-flex>
 
@@ -170,25 +191,18 @@ export default {
       skillRules: [
         v => (v.length <= 10) || '10文字以内⚠️'
       ],
+      postDataRefId: '',
+      confirmDialog: false,
       // http://www.sky-limit-future.com/entry/vue_disabled_btn
       isPushed: false
     }
   },
   computed: {
     disableAddSkill () {
-      // 3項演算子でもいいかも
-      if (this.skill.length > 0 && this.skill.length <= 10) {
-        return false
-      } else {
-        return true
-      }
+      return !(this.skill.length > 0 && this.skill.length <= 10)
     },
     validateTweetContent () {
-      if ((this.name.length > 0 && this.name.length <= 10) && this.skills.length !== 0) {
-        return true
-      } else {
-        return false
-      }
+      return ((this.name.length > 0 && this.name.length <= 10) && this.skills.length !== 0)
     }
   },
   methods: {
@@ -204,7 +218,7 @@ export default {
       this.skills.push(this.skill)
       this.skill = ''
     },
-    post () {
+    createCard () {
       this.isPushed = true
       // firestoreへデータ保存処理
       const savePostToFirebase = firebase.firestore().collection('posts').add({
@@ -220,6 +234,8 @@ export default {
       // https://lab.syncer.jp/Web/JavaScript/Reference/Global_Object/Promise/all/
       Promise.all([savePostToFirebase, generateImage])
         .then(result => {
+          // 画像化、fireStoreへのデータ保存終了後にStorage保存
+
           console.log('FireBaseへの投稿データ保存、画像化処理完了')
           const imageDataUrl = result[1].toDataURL()
           // https://github.com/oliver-moran/jimp/issues/231
@@ -241,7 +257,8 @@ export default {
                   // blobに変換してfirestorageにアップロード
                   const replacedSrc = src.replace(/^data:image\/png;base64,/, '')
                   const blob = this.base64ToBlob(replacedSrc)
-                  this.uploadImageToFirebaseStorage(result[0].id, blob)
+                  this.postDataRefId = result[0].id
+                  this.uploadImageToFirebaseStorage(this.postDataRefId, blob)
                 })
             })
           }
@@ -269,9 +286,13 @@ export default {
         this.applyErrorUI()
       }, _ => {
         this.isPushed = false
-        // https://qiita.com/ampersand/items/2ec01bd5c5b64f1e67bf
-        window.open(`https://twitter.com/share?url=https://skilltweetapp.firebaseapp.com/top/${postDataRefId}&text=私のスキルです👍%20created%20by%20%23SkillApp`)
+        this.confirmDialog = true
       })
+    },
+    tweet (postDataRefId) {
+      this.confirmDialog = false
+      // https://qiita.com/ampersand/items/2ec01bd5c5b64f1e67bf
+      window.open(`https://twitter.com/share?url=https://skilltweetapp.firebaseapp.com/top/${this.postDataRefId}&text=私のスキルです👍%20created%20by%20%23SkillApp`)
     },
     imageResize (imageDataUrl) {
       // https://github.com/oliver-moran/jimp/issues/231

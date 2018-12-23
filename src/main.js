@@ -8,6 +8,7 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import router from './router'
 import App from './App'
+import VueAnalytics from 'vue-analytics'
 
 Vue.config.productionTip = false
 
@@ -18,6 +19,11 @@ Vue.use(Vuetify, {
     secondary: '#A9A9A9',
     accent: '#F11743'
   }
+})
+
+Vue.use(VueAnalytics, {
+  id: 'UA-127231658-2',
+  router
 })
 
 /* eslint-disable no-new */
