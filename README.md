@@ -2,6 +2,8 @@
 
 > A Vue.js project
 
+FirebaseConfigはpushしないこと
+
 ## Build Setup
 
 ``` bash
